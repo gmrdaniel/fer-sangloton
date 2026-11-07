@@ -11,7 +11,7 @@ Los clientes arman su pedido y lo envían por WhatsApp. Solo pickup.
 ├── assets/             # Logo optimizado e íconos que usa la web
 ├── design/             # Archivos fuente (menú y logo originales), no se publican
 ├── vercel.json         # Configuración de Vercel
-├── site.webmanifest    # Ícono/nombre al agregar a pantalla de inicio
+├── manifest.json       # Ícono/nombre al agregar a pantalla de inicio
 ├── robots.txt, sitemap.xml
 ├── favicon.ico
 ├── .env.example        # Plantilla de variables
