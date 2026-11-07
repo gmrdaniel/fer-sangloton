@@ -14,6 +14,7 @@ Los clientes arman su pedido y lo envían por WhatsApp. Solo pickup.
 ├── design/             # Archivos fuente (menú y logo originales), no se publican
 ├── vercel.json         # Configuración de Vercel
 ├── manifest.json       # Ícono/nombre al agregar a pantalla de inicio
+├── sw.js               # Service worker (instalar como app; red primero)
 ├── robots.txt, sitemap.xml
 ├── favicon.ico
 ├── .env.example        # Plantilla de variables
@@ -59,3 +60,9 @@ Configuración:
 2. IAM → Cuentas de servicio → crear una → Claves → Agregar clave → JSON.
 3. Compartir la hoja con el `client_email` de la cuenta de servicio como **Editor**.
 4. En Vercel, agregar las variables de `.env.example` (Production y Preview) y volver a desplegar.
+
+## Instalar como app
+
+Android/Chrome muestran la barra "Instalar" (evento `beforeinstallprompt`, requiere `sw.js` + `manifest.json`).
+En iPhone se muestran los pasos (Compartir → Agregar a inicio). Si cambias archivos y quieres forzar que
+las apps instaladas descarguen todo de nuevo, sube la versión de `CACHE` en `sw.js`.

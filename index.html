@@ -35,6 +35,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="San Glotón" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- Datos estructurados para Google -->
   <script type="application/ld+json">
@@ -259,6 +263,26 @@
       border: 2px solid rgba(58,26,12,.2); background: #fff; color: var(--ink);
     }
     textarea { resize: vertical; min-height: 64px; }
+    /* ---------- Instalar app ---------- */
+    .installbar {
+      position: sticky; top: 0; z-index: 25;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top));
+      background: var(--yellow); color: var(--ink);
+      box-shadow: 0 4px 14px rgba(0,0,0,.35);
+    }
+    .installbar[hidden] { display: none; }
+    .installbar img { width: 38px; height: 38px; border-radius: 9px; flex: none; }
+    .installbar .txt { flex: 1; min-width: 0; font-weight: 700; line-height: 1.25; font-size: .95rem; }
+    .installbar .txt small { display: block; font-weight: 600; opacity: .8; }
+    .installbar .btn { padding: 9px 16px; font-size: .95rem; background: var(--red); color: #fff; }
+    .installbar .x { background: none; border: 0; font-size: 1.2rem; color: var(--ink); padding: 6px; }
+    .steps { padding-left: 22px; margin: 10px 0; }
+    .steps li { margin: 8px 0; }
+    .linkbtn { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; font: inherit; }
+    .sheet .linkbtn { color: var(--muted); font-size: .9rem; font-weight: 700; }
+    footer .linkbtn { color: rgba(246,234,210,.7); margin: 0 6px; }
+
     .sheet-foot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
     .sheet-foot .btn { min-width: 150px; }
     .note a { color: var(--red); font-weight: 700; }
@@ -299,6 +323,13 @@
   </style>
 </head>
 <body>
+  <div class="installbar" id="installBar" hidden>
+    <img src="/assets/icon-192.png" alt="" width="38" height="38" />
+    <div class="txt">Instala San Glotón en tu celular<small>Pide más rápido desde tu pantalla de inicio</small></div>
+    <button type="button" class="btn" id="installBtn">Instalar</button>
+    <button type="button" class="x" id="installX" aria-label="Cerrar">✕</button>
+  </div>
+
   <main class="wrap">
     <header class="hero">
       <img src="/assets/logo.jpg" alt="Logo San Glotón — Boneless, Alitas, Papas" width="340" height="391" />
@@ -343,7 +374,14 @@
       </div>
     </section>
 
-    <footer>© <span id="y">2026</span> San Glotón · Boneless · Alitas · Papas</footer>
+    <footer>
+      <p style="margin:0 0 8px">
+        <button type="button" class="linkbtn" id="installLink" hidden>📲 Instalar app</button>
+        <button type="button" class="linkbtn" id="wipeBtn">Borrar mis datos de este dispositivo</button>
+        <a class="linkbtn" href="/privacidad">Aviso de privacidad</a>
+      </p>
+      © <span id="y">2026</span> San Glotón · Boneless · Alitas · Papas
+    </footer>
   </main>
 
   <!-- Barra inferior -->
@@ -395,6 +433,7 @@
       </div>
       <ul class="cart-list" id="cartList"></ul>
       <div class="total-row"><span style="font-weight:800">Total</span><strong id="cartTotal">$0</strong></div>
+      <button type="button" class="linkbtn" id="emptyCart">Vaciar carrito</button>
 
       <div class="field">
         <label for="cName">Tu nombre</label>
@@ -453,9 +492,27 @@
         <ul class="cart-list" id="okList"></ul>
         <div class="total-row"><span style="font-weight:800">Total</span><strong id="okTotal"></strong></div>
         <div class="sheet-foot">
+          <button type="button" class="btn btn-call" id="okInstall" hidden style="border:2px solid rgba(58,26,12,.2)">📲 Instalar app</button>
           <button type="button" class="btn btn-primary" data-close>Listo</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: instrucciones para instalar en iPhone -->
+  <div class="overlay" id="iosModal" role="dialog" aria-modal="true" aria-labelledby="iosTitle">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h3 id="iosTitle">Instalar en tu iPhone</h3>
+        <button type="button" class="close" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <ol class="steps">
+        <li>Abre esta página en <strong>Safari</strong>.</li>
+        <li>Toca el botón <strong>Compartir</strong> <span aria-hidden="true">(el cuadrito con flecha ⬆️)</span>.</li>
+        <li>Elige <strong>“Agregar a inicio”</strong> y luego <strong>“Agregar”</strong>.</li>
+      </ol>
+      <p class="note">Aparecerá el ícono de San Glotón en tu pantalla de inicio.</p>
+      <div class="sheet-foot"><button type="button" class="btn btn-primary" data-close>Entendido</button></div>
     </div>
   </div>
 
@@ -709,6 +766,59 @@
 
     var tt;
     function toast(msg) { var t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("show"); }, 1600); }
+
+    // ---- Limpiar
+    $("emptyCart").onclick = function () {
+      cart = []; save(); renderBar(); close($("cartModal")); toast("Carrito vacío");
+    };
+    var wipeArmed = false, wipeT;
+    $("wipeBtn").onclick = function () {
+      var b = $("wipeBtn");
+      if (!wipeArmed) { // segundo toque para confirmar (sin diálogos del navegador)
+        wipeArmed = true; b.textContent = "¿Seguro? Toca otra vez para borrar";
+        wipeT = setTimeout(function () { wipeArmed = false; b.textContent = "Borrar mis datos de este dispositivo"; }, 4000);
+        return;
+      }
+      clearTimeout(wipeT); wipeArmed = false; b.textContent = "Borrar mis datos de este dispositivo";
+      ["sg_cart", "sg_me", "sg_last", "sg_pending"].forEach(remove);
+      cart = []; renderBar();
+      ["cName", "cPhone", "cTime", "cNotes"].forEach(function (id) { $(id).value = ""; });
+      toast("Datos borrados");
+    };
+
+    // ---- Instalar como app
+    var deferredPrompt = null;
+    var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    function canInstall() { return !standalone && (deferredPrompt || isIOS); }
+    function refreshInstallUI() {
+      var ok = canInstall();
+      $("installLink").hidden = !ok;
+      $("okInstall").hidden = !ok;
+      var dismissed = load("sg_install_dismissed");
+      $("installBar").hidden = !(ok && (!dismissed || Date.now() - dismissed > 14 * 864e5));
+    }
+    function doInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function (r) {
+          if (r.outcome === "accepted") { $("installBar").hidden = true; }
+          deferredPrompt = null; refreshInstallUI();
+        });
+      } else if (isIOS) {
+        open($("iosModal"));
+      }
+    }
+    window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; refreshInstallUI(); });
+    window.addEventListener("appinstalled", function () { standalone = true; deferredPrompt = null; refreshInstallUI(); toast("¡App instalada!"); });
+    $("installBtn").onclick = doInstall;
+    $("installLink").onclick = doInstall;
+    $("okInstall").onclick = function () { close($("doneModal")); doInstall(); };
+    $("installX").onclick = function () { store("sg_install_dismissed", Date.now()); $("installBar").hidden = true; };
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js").catch(function () {}); });
+    }
+    refreshInstallUI();
 
     $("y").textContent = new Date().getFullYear();
     renderBar();
