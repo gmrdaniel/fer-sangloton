@@ -11,6 +11,9 @@ Los clientes arman su pedido y lo envían por WhatsApp. Solo pickup.
 ├── assets/             # Logo optimizado e íconos que usa la web
 ├── design/             # Archivos fuente (menú y logo originales), no se publican
 ├── vercel.json         # Configuración de Vercel
+├── site.webmanifest    # Ícono/nombre al agregar a pantalla de inicio
+├── robots.txt, sitemap.xml
+├── favicon.ico
 ├── .env.example        # Plantilla de variables
 └── .gitignore
 ```
@@ -33,3 +36,9 @@ npx serve .
 ## Deploy en Vercel
 
 Importa el repo en Vercel con framework **Other** (sin build command, output = raíz).
+
+## Vista previa al compartir
+
+La imagen para redes es `assets/og-image.jpg` (1200×630). Si cambias el dominio, actualiza las URLs
+absolutas en `index.html` (canonical, og:*, twitter:*, JSON-LD), `robots.txt` y `sitemap.xml`.
+Para refrescar la vista previa en Facebook/WhatsApp usa https://developers.facebook.com/tools/debug/
