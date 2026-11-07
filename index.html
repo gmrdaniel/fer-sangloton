@@ -259,7 +259,9 @@
       border: 2px solid rgba(58,26,12,.2); background: #fff; color: var(--ink);
     }
     textarea { resize: vertical; min-height: 64px; }
-    .sheet-foot { display: flex; gap: 10px; margin-top: 18px; }
+    .sheet-foot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .sheet-foot .btn { min-width: 150px; }
+    .note a { color: var(--red); font-weight: 700; }
     .sheet-foot .btn { flex: 1; }
     .error { color: var(--red); font-weight: 700; font-size: .9rem; margin-top: 6px; display: none; }
     .error.show { display: block; }
@@ -400,6 +402,16 @@
         <div class="error" id="nameErr">Escribe tu nombre</div>
       </div>
       <div class="field">
+        <label for="cPhone">Tu WhatsApp (10 dígitos)</label>
+        <input type="tel" id="cPhone" autocomplete="tel-national" inputmode="numeric" maxlength="14" placeholder="55 1234 5678" />
+        <div class="error" id="phoneErr">Escribe un número de 10 dígitos</div>
+      </div>
+      <!-- Campo trampa para bots: los humanos no lo ven -->
+      <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+        <label for="cWebsite">No llenar</label>
+        <input type="text" id="cWebsite" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="field">
         <label for="cTime">Hora para recoger (opcional)</label>
         <input type="time" id="cTime" />
       </div>
@@ -414,7 +426,37 @@
         </button>
       </div>
       <p class="note">Se abrirá WhatsApp con tu pedido listo. Solo presiona enviar. Te confirmamos por ahí. 🙌</p>
+      <p class="note">Usamos tu nombre y teléfono solo para preparar y confirmar tu pedido. <a href="/privacidad" target="_blank">Aviso de privacidad</a>.</p>
     </form>
+  </div>
+
+  <!-- Modal: ¿enviaste tu pedido? / confirmación -->
+  <div class="overlay" id="doneModal" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+    <div class="sheet" id="doneSheet">
+      <div id="askView">
+        <div class="sheet-head">
+          <h3 id="doneTitle">¿Enviaste tu pedido?</h3>
+        </div>
+        <p>Pedido <strong id="askFolio"></strong> · <strong id="askTotal"></strong></p>
+        <p class="note" style="margin-top:0">Confírmalo para limpiar tu carrito. Si no se abrió WhatsApp o no lo enviaste, puedes intentar de nuevo.</p>
+        <div class="sheet-foot">
+          <button type="button" class="btn btn-call" id="askNo" style="border:2px solid rgba(58,26,12,.2)">No, intentar otra vez</button>
+          <button type="button" class="btn btn-wa" id="askYes">Sí, ya lo envié</button>
+        </div>
+      </div>
+      <div id="okView" hidden>
+        <div class="sheet-head">
+          <h3>¡Pedido enviado! 🎉</h3>
+          <button type="button" class="close" data-close aria-label="Cerrar">✕</button>
+        </div>
+        <p>Tu folio es <strong id="okFolio"></strong>. Te confirmamos por WhatsApp cuando esté listo para recoger en <strong>Moneda No. 42, Col. Metropolitana 1ra Secc.</strong></p>
+        <ul class="cart-list" id="okList"></ul>
+        <div class="total-row"><span style="font-weight:800">Total</span><strong id="okTotal"></strong></div>
+        <div class="sheet-foot">
+          <button type="button" class="btn btn-primary" data-close>Listo</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -458,7 +500,10 @@
 
     var cart = [];
     try { cart = JSON.parse(localStorage.getItem("sg_cart") || "[]"); } catch (e) { cart = []; }
-    function save() { try { localStorage.setItem("sg_cart", JSON.stringify(cart)); } catch (e) {} }
+    function load(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } }
+    function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function remove(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    function save() { store("sg_cart", cart); }
 
     // ---- Render salsas
     $("salsas").innerHTML = SALSAS.map(function (s) { return "<li>" + s.name + fire(s.heat) + "</li>"; }).join("");
@@ -548,9 +593,16 @@
     function renderBar() {
       var bar = $("cartbar");
       if (!cart.length) {
+        var last = load("sg_last");
         bar.innerHTML = '<div class="cartbar-inner"><div class="empty">' +
-          '<a class="btn btn-primary" href="#menu-title">Armar pedido</a>' +
+          (last && last.items && last.items.length
+            ? '<button type="button" class="btn btn-primary" id="repeatBtn">Repetir último pedido</button>'
+            : '<a class="btn btn-primary" href="#menu-title">Armar pedido</a>') +
           '<a class="btn btn-call" href="tel:+525580316580">Llamar</a></div></div>';
+        if ($("repeatBtn")) $("repeatBtn").onclick = function () {
+          cart = JSON.parse(JSON.stringify(last.items)); save(); renderBar();
+          renderCart(); open($("cartModal")); toast("Pedido anterior cargado");
+        };
         return;
       }
       bar.innerHTML = '<div class="cartbar-inner"><div class="summary"><strong>' + money(total()) + "</strong><small>" +
@@ -573,26 +625,94 @@
       if (!cart.length) close($("cartModal")); else renderCart();
     });
 
+    // ---- Datos del cliente recordados en este dispositivo
+    var me = load("sg_me") || {};
+    if (me.name) $("cName").value = me.name;
+    if (me.phone) $("cPhone").value = me.phone;
+
+    function lineText(l) { return l.qty + "× " + l.title + (l.opts.length ? " (" + l.opts.join(", ") + ")" : ""); }
+    function newFolio() {
+      var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
+      for (var i = 0; i < 5; i++) s += a[Math.floor(Math.random() * a.length)];
+      return "SG-" + s;
+    }
+    function api(body) {
+      try {
+        fetch("/api/pedido", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+          .catch(function () {});
+      } catch (e) {}
+    }
+
     $("cartForm").addEventListener("submit", function (e) {
       e.preventDefault();
       var name = $("cName").value.trim();
-      if (!name) { $("nameErr").classList.add("show"); $("cName").focus(); return; }
-      $("nameErr").classList.remove("show");
-      var lines = ["¡Hola San Glotón! Quiero hacer un pedido para *pickup*:", ""];
-      cart.forEach(function (l) {
-        lines.push("• " + l.qty + "× " + l.title + (l.opts.length ? " (" + l.opts.join(", ") + ")" : "") + " — " + money(l.unit * l.qty));
-      });
-      lines.push("", "*Total: " + money(total()) + "*", "", "Nombre: " + name);
-      var t = $("cTime").value; if (t) lines.push("Hora para recoger: " + t);
-      var n = $("cNotes").value.trim(); if (n) lines.push("Notas: " + n);
+      var phone = $("cPhone").value.replace(/\D/g, "").replace(/^(52|521)(?=\d{10}$)/, "");
+      $("nameErr").classList.toggle("show", !name);
+      $("phoneErr").classList.toggle("show", phone.length !== 10);
+      if (!name) { $("cName").focus(); return; }
+      if (phone.length !== 10) { $("cPhone").focus(); return; }
+      store("sg_me", { name: name, phone: phone });
+
+      var folio = newFolio();
+      var time = $("cTime").value, notes = $("cNotes").value.trim();
+      var lines = ["¡Hola San Glotón! Quiero hacer un pedido para *pickup*:", "Folio: *" + folio + "*", ""];
+      cart.forEach(function (l) { lines.push("• " + lineText(l) + " — " + money(l.unit * l.qty)); });
+      lines.push("", "*Total: " + money(total()) + "*", "", "Nombre: " + name, "Tel: " + phone);
+      if (time) lines.push("Hora para recoger: " + time);
+      if (notes) lines.push("Notas: " + notes);
+
+      // Abrir WhatsApp de inmediato (si se espera a la red, el celular bloquea la ventana)
       window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+
+      var order = { folio: folio, name: name, phone: phone, time: time, notes: notes, total: total(),
+        items: JSON.parse(JSON.stringify(cart)), sentAt: Date.now() };
+      store("sg_pending", order);
+      api({ action: "create", folio: folio, name: name, phone: phone, time: time, notes: notes,
+        total: order.total, items: cart.map(function (l) { return lineText(l) + " — " + money(l.unit * l.qty); }),
+        website: $("cWebsite").value });
+      close($("cartModal"));
+      setTimeout(askIfSent, 4000); // por si WhatsApp abrió en otra pestaña sin salir de la página
     });
+
+    // ---- ¿Enviaste tu pedido?
+    function askIfSent() {
+      var p = load("sg_pending");
+      if (!p || $("doneModal").classList.contains("open")) return;
+      if (Date.now() - p.sentAt > 6 * 3600 * 1000) { remove("sg_pending"); return; } // muy viejo: descartar
+      $("askFolio").textContent = p.folio;
+      $("askTotal").textContent = money(p.total);
+      $("askView").hidden = false; $("okView").hidden = true;
+      open($("doneModal"));
+    }
+    document.addEventListener("visibilitychange", function () {
+      var p = load("sg_pending");
+      if (document.visibilityState === "visible" && p && Date.now() - p.sentAt > 1500) askIfSent();
+    });
+    $("askNo").onclick = function () {
+      remove("sg_pending"); close($("doneModal"));
+      renderCart(); open($("cartModal"));
+    };
+    $("askYes").onclick = function () {
+      var p = load("sg_pending"); if (!p) return close($("doneModal"));
+      api({ action: "confirm", folio: p.folio });
+      store("sg_last", { folio: p.folio, items: p.items, total: p.total });
+      remove("sg_pending");
+      cart = []; save(); renderBar();
+      $("cNotes").value = ""; $("cTime").value = "";
+      $("okFolio").textContent = p.folio;
+      $("okList").innerHTML = p.items.map(function (l) {
+        return '<li><div class="info-l"><div class="t">' + esc(lineText(l)) + '</div></div><div class="p">' + money(l.unit * l.qty) + "</div></li>";
+      }).join("");
+      $("okTotal").textContent = money(p.total);
+      $("askView").hidden = true; $("okView").hidden = false;
+    };
 
     var tt;
     function toast(msg) { var t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("show"); }, 1600); }
 
     $("y").textContent = new Date().getFullYear();
     renderBar();
+    askIfSent(); // si recargó la página con un pedido pendiente de confirmar
   })();
   </script>
 </body>
