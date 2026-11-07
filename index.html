@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>San Glotón · Boneless, Alitas y Papas</title>
+  <meta name="description" content="Menú de San Glotón: alitas, boneless, costillas y papas. Solo pickup. Arma tu pedido y envíalo por WhatsApp al 55 8031 6580." />
+  <meta name="theme-color" content="#2a140c" />
+  <meta property="og:title" content="San Glotón · Boneless, Alitas y Papas" />
+  <meta property="og:description" content="Arma tu pedido y envíalo por WhatsApp: 55 8031 6580. Solo pickup." />
+  <meta property="og:image" content="/assets/logo.jpg" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #2a140c;
+      --bg-2: #3b1d10;
+      --cream: #f6ead2;
+      --cream-2: #efdcb8;
+      --ink: #3a1a0c;
+      --muted: #7a5236;
+      --red: #d7261e;
+      --orange: #f07a1a;
+      --yellow: #ffd23f;
+      --green: #25d366;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Nunito", system-ui, sans-serif;
+      color: var(--cream);
+      background-color: var(--bg);
+      background-image:
+        repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 2px, transparent 2px 120px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 7px),
+        linear-gradient(180deg, var(--bg-2), var(--bg));
+      background-attachment: fixed;
+      line-height: 1.45;
+      padding-bottom: 96px;
+    }
+    body.lock { overflow: hidden; }
+    a { color: inherit; }
+    button { font: inherit; cursor: pointer; }
+    .wrap { width: min(1100px, 100% - 32px); margin-inline: auto; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid; grid-template-columns: 1fr; gap: 20px;
+      align-items: center; justify-items: center; text-align: center;
+      padding: 28px 0 16px;
+    }
+    .hero img {
+      width: min(300px, 72vw); height: auto; border-radius: 28px;
+      filter: drop-shadow(0 12px 28px rgba(0,0,0,.55));
+    }
+    .badge {
+      display: inline-block; background: var(--red); color: #fff;
+      font-family: "Lilita One", sans-serif; letter-spacing: .06em;
+      padding: 6px 16px; border-radius: 999px; font-size: 1rem; text-transform: uppercase;
+    }
+    .hero h1 {
+      font-family: "Lilita One", sans-serif; font-weight: 400;
+      font-size: clamp(1.6rem, 5vw, 2.6rem); margin: 12px 0 6px;
+      color: var(--yellow); text-shadow: 0 3px 0 rgba(0,0,0,.35);
+    }
+    .hero p { margin: 0 0 18px; color: var(--cream-2); font-size: 1.05rem; }
+    .phone-big {
+      display: block; font-family: "Lilita One", sans-serif;
+      font-size: clamp(2rem, 8vw, 3.2rem); letter-spacing: .02em;
+      color: #fff; text-decoration: none; margin-bottom: 14px;
+    }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 22px; border-radius: 999px; border: 0;
+      font-weight: 800; font-size: 1.05rem; text-decoration: none;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn svg { width: 22px; height: 22px; flex: none; }
+    .btn-wa { background: var(--green); color: #0b3d1e; }
+    .btn-call { background: var(--cream); color: var(--ink); }
+    .btn-primary { background: var(--red); color: #fff; }
+
+    /* ---------- Secciones ---------- */
+    .section-title {
+      font-family: "Lilita One", sans-serif; font-weight: 400;
+      font-size: clamp(1.6rem, 4.5vw, 2.2rem); text-align: center;
+      color: var(--yellow); margin: 36px 0 8px; text-shadow: 0 3px 0 rgba(0,0,0,.35);
+    }
+    .section-sub { text-align: center; color: var(--cream-2); margin: 0 0 16px; }
+    .salsas { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; list-style: none; padding: 0; margin: 0; }
+    .salsas li {
+      background: var(--cream); color: var(--ink); font-weight: 800;
+      padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 0 rgba(0,0,0,.3);
+    }
+
+    /* ---------- Menú ---------- */
+    .menu { display: grid; grid-template-columns: 1fr; gap: 18px; }
+    .card {
+      background: linear-gradient(180deg, var(--cream), var(--cream-2));
+      color: var(--ink); border-radius: var(--radius);
+      padding: 20px 16px 18px;
+      box-shadow: 0 10px 0 rgba(0,0,0,.25), 0 18px 30px rgba(0,0,0,.35);
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ""; position: absolute; inset: 0 0 auto 0; height: 6px;
+      background: linear-gradient(90deg, var(--red), var(--orange), var(--yellow));
+    }
+    .card h3 {
+      font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.8rem;
+      margin: 4px 4px 8px; color: #6b2e12; display: flex; align-items: center; gap: 10px;
+    }
+    .items { list-style: none; margin: 0; padding: 0; }
+    .item-btn {
+      width: 100%; display: flex; align-items: center; gap: 10px;
+      background: transparent; border: 0; color: inherit; text-align: left;
+      padding: 10px 6px; border-radius: 12px; font-size: 1.1rem; font-weight: 600;
+      transition: background .15s ease;
+    }
+    .item-btn:hover, .item-btn:focus-visible { background: rgba(215,38,30,.08); outline: none; }
+    .items li + li .item-btn { border-top: 1px dashed rgba(58,26,12,.2); border-radius: 0 0 12px 12px; }
+    .item-btn .name { flex: none; }
+    .item-btn .sub { display: block; font-size: .88rem; color: var(--muted); }
+    .item-btn .dots { flex: 1; border-bottom: 2px dotted rgba(58,26,12,.35); transform: translateY(-4px); min-width: 12px; }
+    .item-btn .price { font-family: "Lilita One", sans-serif; font-size: 1.35rem; color: var(--red); }
+    .item-btn .add {
+      flex: none; width: 34px; height: 34px; border-radius: 50%;
+      background: var(--red); color: #fff; display: grid; place-items: center;
+      font-size: 1.4rem; font-weight: 800; line-height: 1;
+    }
+    .extra {
+      display: inline-block; margin: 12px 6px 0; background: var(--yellow); color: var(--red);
+      font-family: "Lilita One", sans-serif; font-size: 1.1rem; padding: 6px 14px; border-radius: 10px;
+    }
+
+    /* ---------- Info ---------- */
+    .info { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 36px 0 24px; }
+    .info-box {
+      background: rgba(246,234,210,.08); border: 1px solid rgba(246,234,210,.18);
+      border-radius: var(--radius); padding: 18px 20px;
+    }
+    .info-box h4 { margin: 0 0 6px; font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.25rem; color: var(--yellow); }
+    .info-box p { margin: 0; color: var(--cream-2); }
+    .info-box a { color: #fff; font-weight: 800; }
+    footer { text-align: center; color: rgba(246,234,210,.55); font-size: .85rem; padding: 10px 0 24px; }
+
+    /* ---------- Barra del carrito ---------- */
+    .cartbar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(42,20,12,.95); backdrop-filter: blur(6px);
+      border-top: 1px solid rgba(246,234,210,.15);
+    }
+    .cartbar-inner { width: min(1100px, 100%); margin-inline: auto; display: flex; gap: 10px; align-items: center; }
+    .cartbar .summary { flex: 1; min-width: 0; }
+    .cartbar .summary strong { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.4rem; color: var(--yellow); }
+    .cartbar .summary small { display: block; color: var(--cream-2); }
+    .cartbar .btn { padding: 12px 18px; }
+    .cartbar .empty { display: flex; gap: 10px; width: 100%; }
+    .cartbar .empty .btn { flex: 1; }
+
+    /* ---------- Modales ---------- */
+    .overlay {
+      position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.6);
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .sheet {
+      width: min(560px, 100%); max-height: 92vh; overflow: auto;
+      background: var(--cream); color: var(--ink);
+      border-radius: 22px 22px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom));
+      animation: up .2s ease;
+    }
+    @keyframes up { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sheet-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .sheet h3 { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.6rem; margin: 0; color: #6b2e12; }
+    .sheet .close { background: rgba(58,26,12,.1); border: 0; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem; color: var(--ink); flex: none; }
+    .field { margin: 16px 0; }
+    .field > label, .field > .label { display: block; font-weight: 800; margin-bottom: 8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip input { position: absolute; opacity: 0; pointer-events: none; }
+    .chip span {
+      display: inline-block; padding: 9px 14px; border-radius: 999px;
+      border: 2px solid rgba(58,26,12,.25); font-weight: 700; background: #fff;
+    }
+    .chip input:checked + span { background: var(--red); border-color: var(--red); color: #fff; }
+    .chip input:focus-visible + span { outline: 3px solid var(--orange); outline-offset: 2px; }
+    .toggle { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .toggle input { width: 22px; height: 22px; accent-color: var(--red); }
+    .qty { display: inline-flex; align-items: center; gap: 4px; background: #fff; border-radius: 999px; border: 2px solid rgba(58,26,12,.2); }
+    .qty button { width: 40px; height: 40px; border: 0; background: transparent; font-size: 1.3rem; font-weight: 800; color: var(--red); }
+    .qty output { min-width: 28px; text-align: center; font-weight: 800; font-size: 1.1rem; }
+    input[type=text], input[type=time], textarea {
+      width: 100%; padding: 12px 14px; border-radius: 12px; font: inherit;
+      border: 2px solid rgba(58,26,12,.2); background: #fff; color: var(--ink);
+    }
+    textarea { resize: vertical; min-height: 64px; }
+    .sheet-foot { display: flex; gap: 10px; margin-top: 18px; }
+    .sheet-foot .btn { flex: 1; }
+    .error { color: var(--red); font-weight: 700; font-size: .9rem; margin-top: 6px; display: none; }
+    .error.show { display: block; }
+
+    .cart-list { list-style: none; padding: 0; margin: 8px 0 0; }
+    .cart-list li { display: flex; gap: 10px; align-items: start; padding: 12px 0; border-bottom: 1px dashed rgba(58,26,12,.25); }
+    .cart-list .info-l { flex: 1; }
+    .cart-list .t { font-weight: 800; }
+    .cart-list .d { color: var(--muted); font-size: .92rem; }
+    .cart-list .p { font-family: "Lilita One", sans-serif; font-size: 1.2rem; color: var(--red); white-space: nowrap; }
+    .cart-list .rm { background: none; border: 0; color: var(--muted); font-size: .85rem; text-decoration: underline; padding: 2px 0 0; }
+    .total-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; }
+    .total-row strong { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.7rem; color: var(--red); }
+    .note { font-size: .85rem; color: var(--muted); margin-top: 10px; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%) translateY(20px);
+      background: var(--ink); color: var(--cream); padding: 10px 18px; border-radius: 999px;
+      font-weight: 700; opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 40;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (min-width: 640px) {
+      .menu { grid-template-columns: repeat(2, 1fr); }
+      .info { grid-template-columns: repeat(3, 1fr); }
+      .overlay { align-items: center; }
+      .sheet { border-radius: 22px; }
+    }
+    @media (min-width: 900px) {
+      .hero { grid-template-columns: 340px 1fr; justify-items: start; text-align: left; padding: 40px 0 10px; gap: 40px; }
+      .hero img { width: 340px; }
+      .cta-row { justify-content: flex-start; }
+      .menu { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <img src="/assets/logo.jpg" alt="Logo San Glotón — Boneless, Alitas, Papas" width="340" height="391" />
+      <div>
+        <span class="badge">Solo Pickup</span>
+        <h1>¡Arma tu pedido y pasa por él!</h1>
+        <p>Elige del menú y envíanos tu pedido por WhatsApp, o llámanos:</p>
+        <a class="phone-big" href="tel:+525580316580">55 8031 6580</a>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#menu-title">Ver menú y pedir</a>
+          <a class="btn btn-call" href="tel:+525580316580">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+            Llamar
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section aria-labelledby="salsas-title">
+      <h2 class="section-title" id="salsas-title">Salsas a elegir</h2>
+      <ul class="salsas" id="salsas"></ul>
+    </section>
+
+    <section aria-labelledby="menu-title">
+      <h2 class="section-title" id="menu-title">Menú</h2>
+      <p class="section-sub">Toca un producto para agregarlo a tu pedido</p>
+      <div class="menu" id="menu"></div>
+    </section>
+
+    <section class="info" aria-label="Información">
+      <div class="info-box">
+        <h4>📍 Dirección</h4>
+        <p><a href="https://www.google.com/maps/search/?api=1&query=Moneda+42,+Metropolitana+1ra+Secc,+Nezahualc%C3%B3yotl" target="_blank" rel="noopener">Moneda No. 42, Col. Metropolitana 1ra Secc.</a></p>
+      </div>
+      <div class="info-box">
+        <h4>🛍️ Solo pickup</h4>
+        <p>Haz tu pedido por WhatsApp o llamada y pasa a recogerlo: <a href="tel:+525580316580">55 8031 6580</a></p>
+      </div>
+      <div class="info-box">
+        <h4>👍 Síguenos</h4>
+        <p><a href="https://www.facebook.com/sangloton" target="_blank" rel="noopener">@sangloton</a> en Facebook</p>
+      </div>
+    </section>
+
+    <footer>© <span id="y">2026</span> San Glotón · Boneless · Alitas · Papas</footer>
+  </main>
+
+  <!-- Barra inferior -->
+  <div class="cartbar" id="cartbar"></div>
+
+  <!-- Modal: agregar producto -->
+  <div class="overlay" id="addModal" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+    <form class="sheet" id="addForm">
+      <div class="sheet-head">
+        <div>
+          <h3 id="addTitle"></h3>
+          <div id="addPrice" style="font-weight:700;color:var(--muted)"></div>
+        </div>
+        <button type="button" class="close" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div class="field" id="salsaField">
+        <span class="label">Salsa</span>
+        <div class="chips" id="salsaChips"></div>
+        <div class="error" id="salsaErr">Elige una salsa</div>
+      </div>
+      <div class="field" id="aderezoField">
+        <span class="label">Aderezo</span>
+        <div class="chips" id="aderezoChips"></div>
+        <div class="error" id="aderezoErr">Elige un aderezo</div>
+      </div>
+      <div class="field" id="papasField">
+        <label class="toggle"><input type="checkbox" id="papas" /> Con papas (+$15)</label>
+      </div>
+      <div class="field">
+        <span class="label">Cantidad</span>
+        <div class="qty">
+          <button type="button" id="qMinus" aria-label="Menos">−</button>
+          <output id="qVal">1</output>
+          <button type="button" id="qPlus" aria-label="Más">+</button>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button type="submit" class="btn btn-primary" id="addSubmit">Agregar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal: carrito -->
+  <div class="overlay" id="cartModal" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <form class="sheet" id="cartForm">
+      <div class="sheet-head">
+        <h3 id="cartTitle">Tu pedido</h3>
+        <button type="button" class="close" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <ul class="cart-list" id="cartList"></ul>
+      <div class="total-row"><span style="font-weight:800">Total</span><strong id="cartTotal">$0</strong></div>
+
+      <div class="field">
+        <label for="cName">Tu nombre</label>
+        <input type="text" id="cName" autocomplete="name" placeholder="¿A nombre de quién?" />
+        <div class="error" id="nameErr">Escribe tu nombre</div>
+      </div>
+      <div class="field">
+        <label for="cTime">Hora para recoger (opcional)</label>
+        <input type="time" id="cTime" />
+      </div>
+      <div class="field">
+        <label for="cNotes">Notas (opcional)</label>
+        <textarea id="cNotes" placeholder="Ej. salsa aparte, sin sal en las papas…"></textarea>
+      </div>
+      <div class="sheet-foot">
+        <button type="submit" class="btn btn-wa">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 .1 5.3.1 11.9c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.7c1.7.9 3.7 1.4 5.7 1.4 6.6 0 11.9-5.3 11.9-11.9S18.6 0 12 0zm5.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 2.4.9 2.9.8 3.4.7.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+          Enviar pedido por WhatsApp
+        </button>
+      </div>
+      <p class="note">Se abrirá WhatsApp con tu pedido listo. Solo presiona enviar. Te confirmamos por ahí. 🙌</p>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (function () {
+    // ======= CONFIGURACIÓN (edita aquí precios y productos) =======
+    var WHATSAPP = "525580316580";
+    var PAPAS_EXTRA = 15;
+    var SALSAS = [
+      { name: "Lemon Pepper", heat: 0 },
+      { name: "BBQ", heat: 0 },
+      { name: "Búfalo", heat: 1 },
+      { name: "Mango Habanero", heat: 2 },
+      { name: "Fuego", heat: 3 }
+    ];
+    var ADEREZOS = ["Blue Cheese", "Ranch", "Queso extra"];
+    var MENU = [
+      { cat: "Alitas", emoji: "🍗", salsa: true, papas: true, items: [
+        { id: "al5", name: "Orden 5 pz.", price: 65 },
+        { id: "al10", name: "Orden 10 pz.", price: 120 },
+        { id: "al15", name: "Orden 15 pz.", price: 175 } ] },
+      { cat: "Boneless", emoji: "🍤", salsa: true, papas: true, items: [
+        { id: "bo5", name: "Orden 5 pz.", price: 65 },
+        { id: "bo10", name: "Orden 10 pz.", price: 110 },
+        { id: "bo15", name: "Orden 15 pz.", price: 150 } ] },
+      { cat: "Costillas", emoji: "🍖", salsa: true, papas: true, items: [
+        { id: "co5", name: "Orden 5 pz.", price: 75 },
+        { id: "co10", name: "Orden 10 pz.", price: 150 },
+        { id: "co15", name: "Orden 15 pz.", price: 225 } ] },
+      { cat: "Complementos", emoji: "🍟", items: [
+        { id: "papas", name: "Orden de papas", price: 50 },
+        { id: "aderezo", name: "Aderezo adicional", sub: "Blue Cheese · Ranch · Queso extra", price: 15, aderezo: true } ] }
+    ];
+    // ==============================================================
+
+    var $ = function (id) { return document.getElementById(id); };
+    var money = function (n) { return "$" + n.toLocaleString("es-MX"); };
+    var fire = function (n) { return n ? " " + "🔥".repeat(n) : ""; };
+    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+
+    var cart = [];
+    try { cart = JSON.parse(localStorage.getItem("sg_cart") || "[]"); } catch (e) { cart = []; }
+    function save() { try { localStorage.setItem("sg_cart", JSON.stringify(cart)); } catch (e) {} }
+
+    // ---- Render salsas
+    $("salsas").innerHTML = SALSAS.map(function (s) { return "<li>" + s.name + fire(s.heat) + "</li>"; }).join("");
+
+    // ---- Render menú
+    var byId = {};
+    $("menu").innerHTML = MENU.map(function (c) {
+      var rows = c.items.map(function (it) {
+        byId[it.id] = { cat: c, item: it };
+        return '<li><button type="button" class="item-btn" data-id="' + it.id + '" aria-label="Agregar ' + c.cat + " " + it.name + '">' +
+          '<span class="name">' + it.name + (it.sub ? '<span class="sub">' + it.sub + "</span>" : "") + "</span>" +
+          '<span class="dots"></span><span class="price">' + money(it.price) + "</span>" +
+          '<span class="add" aria-hidden="true">+</span></button></li>';
+      }).join("");
+      return '<article class="card"><h3><span aria-hidden="true">' + c.emoji + "</span>" + c.cat + "</h3>" +
+        '<ul class="items">' + rows + "</ul>" + (c.papas ? '<span class="extra">Con papas +$' + PAPAS_EXTRA + "</span>" : "") + "</article>";
+    }).join("");
+
+    // ---- Modales
+    function open(m) { m.classList.add("open"); document.body.classList.add("lock"); }
+    function close(m) { m.classList.remove("open"); if (!document.querySelector(".overlay.open")) document.body.classList.remove("lock"); }
+    document.querySelectorAll(".overlay").forEach(function (o) {
+      o.addEventListener("click", function (e) { if (e.target === o || e.target.hasAttribute("data-close")) close(o); });
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") document.querySelectorAll(".overlay.open").forEach(close); });
+
+    function chips(container, name, options) {
+      container.innerHTML = options.map(function (o) {
+        return '<label class="chip"><input type="radio" name="' + name + '" value="' + esc(o.value) + '"><span>' + o.label + "</span></label>";
+      }).join("");
+    }
+    chips($("salsaChips"), "salsa", SALSAS.map(function (s) { return { value: s.name, label: s.name + fire(s.heat) }; }));
+    chips($("aderezoChips"), "aderezo", ADEREZOS.map(function (a) { return { value: a, label: a }; }));
+
+    var current = null, qty = 1;
+    function setQty(n) { qty = Math.max(1, Math.min(20, n)); $("qVal").textContent = qty; updateAddBtn(); }
+    function unitPrice() { return current.item.price + (current.cat.papas && $("papas").checked ? PAPAS_EXTRA : 0); }
+    function updateAddBtn() { if (current) $("addSubmit").textContent = "Agregar · " + money(unitPrice() * qty); }
+
+    $("menu").addEventListener("click", function (e) {
+      var b = e.target.closest(".item-btn"); if (!b) return;
+      current = byId[b.dataset.id];
+      $("addTitle").textContent = current.cat.cat + " · " + current.item.name;
+      $("addPrice").textContent = money(current.item.price);
+      $("addForm").reset();
+      $("salsaField").hidden = !current.cat.salsa;
+      $("papasField").hidden = !current.cat.papas;
+      $("aderezoField").hidden = !current.item.aderezo;
+      $("salsaErr").classList.remove("show"); $("aderezoErr").classList.remove("show");
+      setQty(1);
+      open($("addModal"));
+    });
+    $("qMinus").onclick = function () { setQty(qty - 1); };
+    $("qPlus").onclick = function () { setQty(qty + 1); };
+    $("papas").onchange = updateAddBtn;
+
+    $("addForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var f = e.target, opts = [];
+      if (current.cat.salsa) {
+        var s = f.salsa.value;
+        if (!s) { $("salsaErr").classList.add("show"); return; }
+        opts.push("Salsa " + s);
+      }
+      if (current.item.aderezo) {
+        var a = f.aderezo.value;
+        if (!a) { $("aderezoErr").classList.add("show"); return; }
+        opts.push(a);
+      }
+      if (current.cat.papas && $("papas").checked) opts.push("con papas");
+      var title = current.cat.items.length && current.cat.cat !== "Complementos"
+        ? current.cat.cat + " " + current.item.name.replace("Orden ", "")
+        : current.item.name;
+      var key = title + "|" + opts.join("|");
+      var existing = cart.find(function (l) { return l.key === key; });
+      if (existing) existing.qty += qty;
+      else cart.push({ key: key, title: title, opts: opts, unit: unitPrice(), qty: qty });
+      save(); renderBar(); close($("addModal"));
+      toast("Agregado ✔");
+    });
+
+    // ---- Carrito
+    function total() { return cart.reduce(function (s, l) { return s + l.unit * l.qty; }, 0); }
+    function count() { return cart.reduce(function (s, l) { return s + l.qty; }, 0); }
+
+    var waIcon = $("cartForm").querySelector("svg").outerHTML;
+    function renderBar() {
+      var bar = $("cartbar");
+      if (!cart.length) {
+        bar.innerHTML = '<div class="cartbar-inner"><div class="empty">' +
+          '<a class="btn btn-primary" href="#menu-title">Armar pedido</a>' +
+          '<a class="btn btn-call" href="tel:+525580316580">Llamar</a></div></div>';
+        return;
+      }
+      bar.innerHTML = '<div class="cartbar-inner"><div class="summary"><strong>' + money(total()) + "</strong><small>" +
+        count() + (count() === 1 ? " producto" : " productos") + '</small></div>' +
+        '<button type="button" class="btn btn-wa" id="openCart">' + waIcon + "Ver pedido</button></div>";
+      $("openCart").onclick = function () { renderCart(); open($("cartModal")); };
+    }
+    function renderCart() {
+      $("cartList").innerHTML = cart.map(function (l, i) {
+        return '<li><div class="info-l"><div class="t">' + l.qty + "× " + esc(l.title) + "</div>" +
+          (l.opts.length ? '<div class="d">' + esc(l.opts.join(" · ")) + "</div>" : "") +
+          '<button type="button" class="rm" data-i="' + i + '">Quitar</button></div>' +
+          '<div class="p">' + money(l.unit * l.qty) + "</div></li>";
+      }).join("");
+      $("cartTotal").textContent = money(total());
+    }
+    $("cartList").addEventListener("click", function (e) {
+      var b = e.target.closest(".rm"); if (!b) return;
+      cart.splice(+b.dataset.i, 1); save(); renderBar();
+      if (!cart.length) close($("cartModal")); else renderCart();
+    });
+
+    $("cartForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = $("cName").value.trim();
+      if (!name) { $("nameErr").classList.add("show"); $("cName").focus(); return; }
+      $("nameErr").classList.remove("show");
+      var lines = ["¡Hola San Glotón! 👋 Quiero hacer un pedido para *pickup*:", ""];
+      cart.forEach(function (l) {
+        lines.push("• " + l.qty + "× " + l.title + (l.opts.length ? " (" + l.opts.join(", ") + ")" : "") + " — " + money(l.unit * l.qty));
+      });
+      lines.push("", "*Total: " + money(total()) + "*", "", "Nombre: " + name);
+      var t = $("cTime").value; if (t) lines.push("Hora para recoger: " + t);
+      var n = $("cNotes").value.trim(); if (n) lines.push("Notas: " + n);
+      window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+    });
+
+    var tt;
+    function toast(msg) { var t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("show"); }, 1600); }
+
+    $("y").textContent = new Date().getFullYear();
+    renderBar();
+  })();
+  </script>
+</body>
+</html>
