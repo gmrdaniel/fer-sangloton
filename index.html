@@ -523,7 +523,7 @@
       var name = $("cName").value.trim();
       if (!name) { $("nameErr").classList.add("show"); $("cName").focus(); return; }
       $("nameErr").classList.remove("show");
-      var lines = ["¡Hola San Glotón! 👋 Quiero hacer un pedido para *pickup*:", ""];
+      var lines = ["¡Hola San Glotón! Quiero hacer un pedido para *pickup*:", ""];
       cart.forEach(function (l) {
         lines.push("• " + l.qty + "× " + l.title + (l.opts.length ? " (" + l.opts.join(", ") + ")" : "") + " — " + money(l.unit * l.qty));
       });
