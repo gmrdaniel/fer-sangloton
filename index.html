@@ -499,20 +499,16 @@
     </div>
   </div>
 
-  <!-- Modal: instrucciones para instalar en iPhone -->
+  <!-- Modal: instrucciones para instalar (contenido según navegador) -->
   <div class="overlay" id="iosModal" role="dialog" aria-modal="true" aria-labelledby="iosTitle">
     <div class="sheet">
       <div class="sheet-head">
-        <h3 id="iosTitle">Instalar en tu iPhone</h3>
+        <h3 id="iosTitle">Instalar la app</h3>
         <button type="button" class="close" data-close aria-label="Cerrar">✕</button>
       </div>
-      <ol class="steps">
-        <li>Abre esta página en <strong>Safari</strong>.</li>
-        <li>Toca el botón <strong>Compartir</strong> <span aria-hidden="true">(el cuadrito con flecha ⬆️)</span>.</li>
-        <li>Elige <strong>“Agregar a inicio”</strong> y luego <strong>“Agregar”</strong>.</li>
-      </ol>
+      <div id="installHelp"></div>
       <p class="note">Aparecerá el ícono de San Glotón en tu pantalla de inicio.</p>
-      <div class="sheet-foot"><button type="button" class="btn btn-primary" data-close>Entendido</button></div>
+      <div class="sheet-foot" id="installActions"></div>
     </div>
   </div>
 
@@ -789,8 +785,61 @@
     // ---- Instalar como app
     var deferredPrompt = null;
     var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    function canInstall() { return !standalone && (deferredPrompt || isIOS); }
+    var UA = navigator.userAgent;
+    var isIOS = /iPhone|iPad|iPod/i.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var isAndroid = /Android/i.test(UA);
+    // Navegadores internos de apps (no permiten instalar)
+    var inApp = (function () {
+      if (/Instagram/i.test(UA)) return { name: "Instagram", steps: "Toca el menú <strong>···</strong> (arriba a la derecha) → <strong>“Abrir en el navegador externo”</strong>." };
+      if (/FBAN|FBAV|FB_IAB|FBIOS|Messenger/i.test(UA)) return { name: "Facebook", steps: "Toca el menú <strong>···</strong> → <strong>“Abrir en navegador externo”</strong>." };
+      if (/WhatsApp/i.test(UA)) return { name: "WhatsApp", steps: "Toca el menú <strong>⋮</strong> o el ícono de brújula → <strong>“Abrir en el navegador”</strong>." };
+      if (/TikTok|musical_ly|BytedanceWebview/i.test(UA)) return { name: "TikTok", steps: "Toca el menú <strong>···</strong> → <strong>“Abrir en el navegador”</strong>." };
+      if (/Snapchat|Twitter|LinkedInApp|Line\/|Pinterest/i.test(UA)) return { name: "esta app", steps: "Busca en el menú la opción <strong>“Abrir en el navegador”</strong>." };
+      return null;
+    })();
+    var iosBrowser = /CriOS/.test(UA) ? "Chrome" : /EdgiOS/.test(UA) ? "Edge" : /FxiOS/.test(UA) ? "Firefox" : "Safari";
+    var SITE = "https://fer-sangloton.vercel.app/";
+    function canInstall() { return !standalone && (deferredPrompt || isIOS || (inApp && isAndroid)); }
+
+    function showInstallHelp() {
+      var help = "", actions = "";
+      if (inApp) {
+        $("iosTitle").textContent = "Ábrelo en tu navegador";
+        help = "<p>Estás viendo la página dentro de <strong>" + inApp.name + "</strong>, y desde ahí no se puede instalar. " +
+          "Ábrela en " + (isIOS ? "Safari" : "Chrome") + ":</p>" +
+          '<ol class="steps"><li>Toca <strong>“Abrir en ' + (isIOS ? "Safari" : "Chrome") + "”</strong> aquí abajo.</li>" +
+          "<li>Si no funciona: " + inApp.steps + "</li>" +
+          "<li>O copia el enlace y pégalo en " + (isIOS ? "Safari" : "Chrome") + ".</li></ol>";
+        var openUrl = isIOS ? "x-safari-" + SITE
+          : "intent://" + SITE.replace(/^https:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + encodeURIComponent(SITE) + ";end";
+        actions = '<button type="button" class="btn btn-call" id="copyLink" style="border:2px solid rgba(58,26,12,.2)">Copiar enlace</button>' +
+          '<a class="btn btn-primary" href="' + openUrl + '">Abrir en ' + (isIOS ? "Safari" : "Chrome") + "</a>";
+      } else {
+        $("iosTitle").textContent = "Instalar en tu iPhone";
+        var share = iosBrowser === "Safari"
+          ? "Toca <strong>Compartir</strong> (el cuadrito con flecha ⬆️). Si no lo ves, está dentro del menú <strong>···</strong>."
+          : "Toca <strong>Compartir</strong> (el cuadrito con flecha ⬆️) junto a la barra de direcciones" + (iosBrowser === "Firefox" ? ", o dentro del menú <strong>☰</strong>" : "") + ".";
+        help = '<ol class="steps"><li>' + share + "</li>" +
+          "<li>Desliza y elige <strong>“Agregar a inicio”</strong> (o “Agregar a pantalla de inicio”).</li>" +
+          "<li>Toca <strong>“Agregar”</strong>.</li></ol>" +
+          (iosBrowser !== "Safari" ? '<p class="note">¿No aparece la opción? Tu iPhone necesita iOS 16.4 o más reciente; si no, abre la página en Safari.</p>' : "");
+        actions = '<button type="button" class="btn btn-primary" data-close>Entendido</button>';
+      }
+      $("installHelp").innerHTML = help;
+      $("installActions").innerHTML = actions;
+      if ($("copyLink")) $("copyLink").onclick = function () {
+        var done = function () { toast("Enlace copiado"); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(SITE).then(done, fallbackCopy);
+        else fallbackCopy();
+        function fallbackCopy() {
+          var t = document.createElement("textarea"); t.value = SITE; t.setAttribute("readonly", "");
+          t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select();
+          try { document.execCommand("copy"); done(); } catch (e) { toast(SITE); }
+          t.remove();
+        }
+      };
+      open($("iosModal"));
+    }
     function refreshInstallUI() {
       var ok = canInstall();
       $("installLink").hidden = !ok;
@@ -805,8 +854,8 @@
           if (r.outcome === "accepted") { $("installBar").hidden = true; }
           deferredPrompt = null; refreshInstallUI();
         });
-      } else if (isIOS) {
-        open($("iosModal"));
+      } else if (isIOS || inApp) {
+        showInstallHelp();
       }
     }
     window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; refreshInstallUI(); });
